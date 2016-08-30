@@ -1,29 +1,46 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Marked to be ignored
+*.ignore
 
-# Precompiled Headers
-*.gch
-*.pch
+# Compressed Files
+*.root
+*.zip
+*.rar
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Pictures
+*.gif
+*.eps
+*.jpg
+*.pdf
+*.png
 
-# Fortran module files
-*.mod
-*.smod
+# Compilation extras
+*.pyc
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# SCRAM extras
+__init__.py
+__init__.pyc
 
 # Executables
-*.exe
-*.out
-*.app
+*_process
+
+# Data files
+
+# Logs
+nohup.out
+*.log
+
+# References
+References/*
+
+# Notes
+*.todo
+jegyzet.txt
+jegyzet.md
+
+# Sublime text files
+*.sublime-*
+*.temp
+
+# Instlumi and pileup maps
+# Resources/Sources/Includes/Histogram_generation/Fill_parameters/Instlumi_map/run_ls_instlumi_pileup_2012.txt
+# Resources/Sources/Includes/Histogram_generation/Fill_parameters/Instlumi_map/run_ls_instlumi_pileup_2015.txt
