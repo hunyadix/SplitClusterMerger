@@ -32,7 +32,7 @@
 #include "../interface/PixelDataTree.h"
 #include "../interface/EventDataTree.h"
 // Module data
-#include "../interface/ModuleDataProducer.h"
+#include "../ModuleDataFetcher/interface/ModuleDataProducer.h"
 // Cluster/Pixel geometry
 #include "../interface/ClusterGeometry.h"
 // Tracker topology

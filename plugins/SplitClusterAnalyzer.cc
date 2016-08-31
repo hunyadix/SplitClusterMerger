@@ -212,17 +212,7 @@ void SplitClusterAnalyzer::handleClusters(const edm::Handle<edmNew::DetSetVector
 		if((subdetId != PixelSubdetector::PixelBarrel) && (subdetId != PixelSubdetector::PixelEndcap)) continue;
 		// Get module data
 		ModuleData mod    = ModuleDataProducer::getPhaseZeroOfflineModuleData(detId.rawId(), trackerTopology, fedErrors);
-		ModuleData mod_on = ModuleDataProducer::convertPhaseZeroOfflineOnline(clusterField.mod);
-		// This check seems to be required: TODO: check why
-		if(mod.det == NOVAL_I)
-		{
-			DetId checkDetId(detId.rawId());
-			unsigned int checkSubdetId = checkDetId.subdetId();
-			std::cout << "Subdetid seems not to function properly." << std::endl;
-			std::cout << "subdetId == PixelSubdetector::PixelBarrel: " << (subdetId == PixelSubdetector::PixelBarrel) << std::endl;
-			std::cout << "subdetId == PixelSubdetector::PixelEndcap: " << (subdetId == PixelSubdetector::PixelEndcap) << std::endl;
-			continue;
-		}
+		ModuleData mod_on = ModuleDataProducer::convertPhaseZeroOfflineOnline(mod);
 		// Map for mergeable cluster pairs
 		std::map<const SiPixelCluster*, const SiPixelCluster*> clusterPairsToMerge;
 		// Looping on clusters on the same detector_part
@@ -457,18 +447,34 @@ void SplitClusterAnalyzer::savePixelData(const SiPixelCluster::Pixel& pixelToSav
 	pixelTree -> Fill();
 }
 
+// Chip size: 80 rows, 52 columns
+// Ladder coordinate range:
+// Layer 1: [-10, 10];
+// Layer 2: [-16, 16];
+// Layer 3: [-22, 22];
+// Pixels per module in ladder coordinate direction: 80 
+// Layer 1: [-10, 10] -> [ -800,  800];
+// Layer 2: [-16, 16] -> [-1280, 1280];
+// Layer 3: [-22, 22] -> [-1760, 1760];
+// Histo definition:
+// Layer 1: [-10, 10] -> [ -800,  800] -> [ -800.5,  800.5];
+// Layer 2: [-16, 16] -> [-1280, 1280] -> [-1280.5, 1280.5];
+// Layer 3: [-22, 22] -> [-1760, 1760] -> [-1760.5, 1760.5];
+// Module coordinate range:
+// All layers: [-4, 4]
+// Pixels per module in ladder coordinate direction: 52 
+// Histo definition:
+// All layers: [-4, 4] -> [-208.5, 208.5]
+
 void SplitClusterAnalyzer::createEventPlot()
 {
-	currentEventPlotLayer1 = new TH2D(("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), 468, 234, 234, 3600, 1800, 1800);
-	currentEventPlotLayer2 = new TH2D(("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), 468, 234, 234, 3600, 1800, 1800);
-	currentEventPlotLayer3 = new TH2D(("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), 468, 234, 234, 3600, 1800, 1800);
+	currentEventPlotLayer1 = new TH2D(("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), 417, -208.5, 208.5, 1601, -800.5, 800.5);
+	currentEventPlotLayer2 = new TH2D(("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), 417, -208.5, 208.5, 2561, -1280.5, 1280.5);
+	currentEventPlotLayer3 = new TH2D(("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), 417, -208.5, 208.5, 3521, -1760.5, 1760.5);
 }
 
 void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSave, const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection)
 {
-    // Layers range: 1 - 3
-	// Module range: -4.5 - 4.5
-	// Ladders range: -22.5 - 22.5
 	int fillWeight = checkIfNextToDcolLostDigi(pixelToSave, digiFlagsCollection);
 	// int moduleCoordinate = mod_on.module * 52;
 	// int ladderCoordinate = mod_on.ladder * 80;
@@ -491,6 +497,7 @@ void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSav
 		default:
 			std::cout << "Error: layer coordinate of a pixel is invalid: " << mod_on.layer << std::endl;
 			std::cout << "Info: Det: " << mod_on.det << ". Ladder:" << mod_on.ladder << ". Module:" << mod_on.module << "." << std::endl;
+			break;
 			// handleDefaultError("data_analysis", "data_analysis", {"Failed to deduce the layer coordinate of a pixel: layer: ", std::to_string(mod_on.layer)});
 	}
 }

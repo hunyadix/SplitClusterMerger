@@ -1,7 +1,7 @@
 #ifndef MERGING_STATISTICS_STRUCTURE_H
 #define MERGING_STATISTICS_STRUCTURE_H
 
-#include "../interface/ModuleData.h"
+#include "../ModuleDataFetcher/interface/ModuleData.h"
 
 #include <string>
 

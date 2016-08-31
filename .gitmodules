@@ -1,0 +1,3 @@
+[submodule "ModuleDataFetcher"]
+	path = ModuleDataFetcher
+	url = git@github.com:hunyadix/ModuleDataFetcher.git

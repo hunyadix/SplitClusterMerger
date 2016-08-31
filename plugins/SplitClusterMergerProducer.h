@@ -31,7 +31,7 @@
 #include "Geometry/Records/interface/TrackerTopologyRcd.h"
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 // Module data
-#include "../interface/ModuleDataProducer.h"
+#include "../ModuleDataFetcher/interface/ModuleDataProducer.h"
 // For the merging
 #include "../interface/ClusterPairMergingValidator.h"
 
