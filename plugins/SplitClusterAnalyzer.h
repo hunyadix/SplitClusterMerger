@@ -137,6 +137,7 @@ class SplitClusterAnalyzer : public edm::EDAnalyzer
 		void                               saveSnapshotData(const SiPixelCluster& currentCluster, const SiPixelCluster& clusterToMerge);
 		void                               savePixelData(const SiPixelCluster::Pixel& pixelToSave, const ModuleData& mod, const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection);
 		void                               createEventPlot();
+		// void                               addMarkersToEventPlot(const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection);
 		void                               fillEventPlot(const SiPixelCluster::Pixel& pixelToSave, const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection);
 		void                               saveEventPlot();
 
