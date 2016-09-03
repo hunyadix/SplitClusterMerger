@@ -25,7 +25,7 @@
 ///////////
 
 // Fed errors
-#include "../interface/FedErrorFetcher.h"
+#include "../FedErrorFetcher/interface/FedErrorFetcher.h"
 // Tree branching
 #include "../interface/ClusterDataTree.h"
 #include "../interface/MergingStatisticsTree.h"

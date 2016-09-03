@@ -70,7 +70,7 @@ void SplitClusterMergerProducer::mergeClusters(const edm::Handle<edmNew::DetSetV
 				ClusterPairMergingValidator validator(currentCluster, *closeClusterPtr);
 				if(!(validator.isMissingPartDoubleColumn())) continue;
 				if(!(validator.isPairNotTooLong()))          continue;
-				if(!(validator.isDirSimilar()))              continue;
+				// if(!(validator.isDirSimilar()))              continue;
 				if(clusterToMergePtr != nullptr)
 				{
 					std::cerr << c_red << "Error: " << c_def << "One of the clusters has more than one mergeable cluster candidates. Merging only the last one..." << std::endl;

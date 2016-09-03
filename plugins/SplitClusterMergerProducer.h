@@ -24,7 +24,7 @@
 ///////////
 
 // Fed errors
-#include "../interface/FedErrorFetcher.h"
+#include "../FedErrorFetcher/interface/FedErrorFetcher.h"
 // For the tracker topology handle
 #include "FWCore/Framework/interface/ESHandle.h"
 // Tracker topology

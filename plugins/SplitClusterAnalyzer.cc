@@ -208,8 +208,6 @@ void SplitClusterAnalyzer::handleClusters(const edm::Handle<edmNew::DetSetVector
 		detIdToMarkerPtrMap.insert(std::pair<DetId, const edm::DetSet<PixelDigi>*>(markerSet.detId(), &markerSet));
 	}
 	// Looping on all the clusters
-	int maximumPixelX = 0;
-	int maximumPixelY = 0;
 	for(const auto& clusterSetOnModule: *clusterCollection)
 	{
 		// std::cerr << "Num clusters on module: " << clusterSetOnModule.size() << std::endl;
@@ -256,11 +254,6 @@ void SplitClusterAnalyzer::handleClusters(const edm::Handle<edmNew::DetSetVector
 			for(const auto& pixel: currentClusterPixels)
 			{
 				savePixelData(pixel, mod, mod_on, *digiFlagsOnModulePtr);
-				if(mod_on.det == 0)
-				{
-					if(maximumPixelX < pixel.x) maximumPixelX = pixel.x;
-					if(maximumPixelY < pixel.y) maximumPixelY = pixel.y;
-				}
 				if(numSavedEventPlots < maxEventPlotsToSave)
 				{
 					fillEventPlot(pixel, mod_on, *digiFlagsOnModulePtr);
@@ -316,11 +309,44 @@ void SplitClusterAnalyzer::handleClusters(const edm::Handle<edmNew::DetSetVector
 	}
 	if(numSavedEventPlots < maxEventPlotsToSave)
 	{
+		// This test has produced no collisions between fill values
+		// although it didn't quite exactly produced plottable results (the cause might be some kind of root canvas error)
+
+		// const edm::DetSet<PixelDigi> emptyColl;
+		// for(int layerTestValue = 1; layerTestValue <= 3; ++layerTestValue)
+		// {
+		// 	int laddersTestValueLimit;
+		// 	switch(layerTestValue)
+		// 	{
+		// 		case 1:  laddersTestValueLimit = 10; break;
+		// 		case 2:  laddersTestValueLimit = 16; break;
+		// 		case 3:  laddersTestValueLimit = 22; break;
+		// 		default: std::cout << "Test error" << std::endl;
+		// 	}
+		// 	for(int ladderTestValue = -laddersTestValueLimit; ladderTestValue <= laddersTestValueLimit; ++ladderTestValue)
+		// 	{
+		// 		if(ladderTestValue == 0) continue;
+		// 		for(int moduleTestValue = -4; moduleTestValue <= 4; ++moduleTestValue)
+		// 		{
+		// 			if(moduleTestValue == 0) continue;
+		// 			ModuleData moduleDataTestValue;
+		// 			moduleDataTestValue.layer  = layerTestValue;
+		// 			moduleDataTestValue.ladder = ladderTestValue;
+		// 			moduleDataTestValue.module = layerTestValue;
+		// 			for(int row = 0; row < 160; ++row)
+		// 			{
+		// 				for(int col = 0; col < 416; ++col)
+		// 				{
+		// 					SiPixelCluster::Pixel pixelTestValue(row, col, 1);
+		// 					fillEventPlot(pixelTestValue, moduleDataTestValue, emptyColl);
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 		saveEventPlot();
 		++numSavedEventPlots;
 	}
-	std::cout << "Maximum pixel x: " << maximumPixelX << std::endl;
-	std::cout << "Maximum pixel y: " << maximumPixelY << std::endl;
 	std::cerr << "Num clusters: " << numClusters << std::endl;
 }
 
@@ -488,45 +514,50 @@ void SplitClusterAnalyzer::savePixelData(const SiPixelCluster::Pixel& pixelToSav
 // Layer 2: [-16, 16];
 // Layer 3: [-22, 22];
 // Pixels per module in ladder coordinate direction: 80 * 2 = 160
-// Layer 1: [-10, 10] -> [-1600, 1600];
-// Layer 2: [-16, 16] -> [-2560, 2560];
-// Layer 3: [-22, 22] -> [-3520, 3520];
 // Histo definition:
-// Layer 1: [-10, 10] -> [-1600, 1600] -> [-1600.5, 1600.5];
-// Layer 2: [-16, 16] -> [-2560, 2560] -> [-2560.5, 2560.5];
-// Layer 3: [-22, 22] -> [-3520, 3520] -> [-3520.5, 3520.5];
+// Layer 1: [-10, 10] -> -> [1679, 1679];
+// Layer 2: [-16, 16] -> -> [2639, 2639];
+// Layer 3: [-22, 22] -> -> [3599, 3599];
 // Module coordinate range:
-// All layers: [-4, 4]
+// All layers: [-4, 4] + extra for 0
 // Pixels per module in ladder coordinate direction: 52 * 8 = 416
 // Histo definition:
-// All layers: [-4, 4] -> [-1644.5, 1644.5]
+// All layers: [-1871, 1871]
 
 void SplitClusterAnalyzer::createEventPlot()
 {
-	currentEventPlotLayer1 = new TH2D(("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), 3289, -1644.5, 1644.5, 3201, -1600.5, 1600.5);
-	currentEventPlotLayer2 = new TH2D(("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), 3289, -1644.5, 1644.5, 5121, -2560.5, 2560.5);
-	currentEventPlotLayer3 = new TH2D(("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), 3289, -1644.5, 1644.5, 7041, -3520.5, 3520.5);
+	currentEventPlotLayer1 = new TH2D(("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_1_" + std::to_string(numSavedEventPlots)).c_str(), 3743, -1871.5, 1871.5, 3359, -1679.5, 1679.5);
+	currentEventPlotLayer2 = new TH2D(("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_2_" + std::to_string(numSavedEventPlots)).c_str(), 3743, -1871.5, 1871.5, 5279, -2639.5, 2639.5);
+	currentEventPlotLayer3 = new TH2D(("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), ("event_plot_layer_3_" + std::to_string(numSavedEventPlots)).c_str(), 3743, -1871.5, 1871.5, 7199, -3599.5, 3599.5);
 }
 
 void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSave, const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection)
 {
+	// Pixel x range: [0, 159]
+	// Pixel y range: [0, 415]
+	// Seems like x coordinate corresponds to row, y coordinate corresponds to col
 	// Check if pixel is on endcap
 	if(mod_on.det == 1) return;
 	// For every second module the ladder coordinate is numbered the other way around
-	int isReversedModule = mod_on.module % 2;
+	// For a reversed coordinate the pixel x coordinate decreases as the global x increases
+	// FIXME: This just seems to be a garbage definition, change it
+	int isReversedModule = ModuleDataProducer::isPhaseZeroLadderRowNumberingReversed(mod_on.ladder);
 	// 2 ROCs per module in ladder direction and 80 pixel per column
-	int ladderCoordinate = mod_on.ladder * 160 + pixelToSave.x;
-	// TODO: check for reverse parity
 	// 8 ROCs per module in module direction and 52 columns
-	int moduleCoordinate;
+	int moduleCoordinate = NOVAL_I;
+	int ladderCoordinate = NOVAL_I;
 	if(isReversedModule)
 	{
-		moduleCoordinate = (mod_on.module + 1) * 52 - pixelToSave.y;
+		if(mod_on.ladder < 0) ladderCoordinate = (mod_on.ladder + 0.5) * 160 - pixelToSave.x;
+		if(0 < mod_on.ladder) ladderCoordinate = (mod_on.ladder + 0.5) * 160 - pixelToSave.x - 1;
 	}
 	else
 	{
-		moduleCoordinate = mod_on.module * 416 + pixelToSave.y;
+		if(mod_on.ladder < 0) ladderCoordinate = (mod_on.ladder - 0.5) * 160 + pixelToSave.x + 1;
+		if(0 < mod_on.ladder) ladderCoordinate = (mod_on.ladder - 0.5) * 160 + pixelToSave.x;
 	}
+	if(mod_on.module < 0) moduleCoordinate = (mod_on.module - 0.5) * 416 + pixelToSave.y + 1;
+	if(0 < mod_on.module) moduleCoordinate = (mod_on.module - 0.5) * 416 + pixelToSave.y;
 	int fillWeight = (checkIfNextToDcolLostDigi(pixelToSave, digiFlagsCollection)) ? 2 : 1;
 	// Fill the appropriate layer plot
 	switch(mod_on.layer)
@@ -535,6 +566,8 @@ void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSav
 			if(currentEventPlotLayer1 -> GetBinContent(moduleCoordinate, ladderCoordinate) != 0)
 			{
 				std::cout << "Filling (" << moduleCoordinate << ", " << ladderCoordinate << ") that has already been filled. Value before filling: " << currentEventPlotLayer1 -> GetBinContent(moduleCoordinate, ladderCoordinate) << ". Reversed module? " << isReversedModule << std::endl; 
+				std::cout << "mod_on.layer: "  << mod_on.layer  << ". mod_on.ladder: " << mod_on.ladder << ". mod_on.module: " << mod_on.module << std::endl;
+				std::cout << "pixelToSave.x: " << pixelToSave.x << ". pixelToSave.y: " << pixelToSave.y << std::endl;
 			}
 			currentEventPlotLayer1 -> Fill(moduleCoordinate, ladderCoordinate, fillWeight);
 			break;
@@ -542,6 +575,8 @@ void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSav
 			if(currentEventPlotLayer2 -> GetBinContent(moduleCoordinate, ladderCoordinate) != 0)
 			{
 				std::cout << "Filling (" << moduleCoordinate << ", " << ladderCoordinate << ") that has already been filled. Value before filling: " << currentEventPlotLayer2 -> GetBinContent(moduleCoordinate, ladderCoordinate) << ". Reversed module? " << isReversedModule << std::endl; 
+				std::cout << "mod_on.layer: " << mod_on.layer << ". mod_on.ladder: " << mod_on.ladder << ". mod_on.module: " << mod_on.module << std::endl;
+				std::cout << "pixelToSave.x: " << pixelToSave.x << ". pixelToSave.y: " << pixelToSave.y << std::endl;
 			}
 			currentEventPlotLayer2 -> Fill(moduleCoordinate, ladderCoordinate, fillWeight);
 			break;
@@ -549,6 +584,8 @@ void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSav
 			if(currentEventPlotLayer3 -> GetBinContent(moduleCoordinate, ladderCoordinate) != 0)
 			{
 				std::cout << "Filling (" << moduleCoordinate << ", " << ladderCoordinate << ") that has already been filled. Value before filling: " << currentEventPlotLayer3 -> GetBinContent(moduleCoordinate, ladderCoordinate) << ". Reversed module? " << isReversedModule << std::endl; 
+				std::cout << "mod_on.layer: " << mod_on.layer << ". mod_on.ladder: " << mod_on.ladder << ". mod_on.module: " << mod_on.module << std::endl;
+				std::cout << "pixelToSave.x: " << pixelToSave.x << ". pixelToSave.y: " << pixelToSave.y << std::endl;
 			}
 			currentEventPlotLayer3 -> Fill(moduleCoordinate, ladderCoordinate, fillWeight);
 			break;
