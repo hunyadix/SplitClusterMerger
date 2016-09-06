@@ -433,24 +433,21 @@ void SplitClusterAnalyzer::saveMergingData(const SiPixelCluster& currentCluster,
 	}
 	std::sort(clusterToMergeADCs.begin(), clusterToMergeADCs.end());
 	// Saving informations about the mergeable clusters
-	mergeStatField.clusterSizes[0]           = currentCluster.size();
-	mergeStatField.clusterSizes[1]           = clusterToMerge.size();
-	mergeStatField.clusterCharges[0]         = currentCluster.charge();
-	mergeStatField.clusterCharges[1]         = clusterToMerge.charge();
-	mergeStatField.totalPixelADCs[0]         = currentClusterTotalPixelADC;
-	mergeStatField.totalPixelADCs[1]         = clusterToMergeTotalPixelADC;
-	mergeStatField.medianPixelADCs[0]        = currentClPixelADCs[currentClPixelADCs.size() / 2];
-	mergeStatField.medianPixelADCs[1]        = clusterToMergeADCs[clusterToMergeADCs.size() / 2];
-	mergeStatField.averagePixelADCs[0]       = currentClusterTotalPixelADC / currentClPixelADCs.size();
-	mergeStatField.averagePixelADCs[1]       = clusterToMergeTotalPixelADC / clusterToMergeADCs.size();
-	mergeStatField.sizeDifference            = currentCluster.size()   - clusterToMerge.size();
-	mergeStatField.chargeDifference          = currentCluster.charge() - clusterToMerge.charge();
-	// mergeStatField.closestPixelADCDifference = closePixelPairs[0].first.adc - closePixelPairs[0].second.adc;
-	mergeStatField.isSplitCluster            = isCurrentClusterSplit;
-	mergeStatField.averagePixelADCDifference = mergeStatField.averagePixelADCs[0] - mergeStatField.averagePixelADCs[1];
-	mergeStatField.medianPixelADCDifference  = mergeStatField.medianPixelADCs[0]  - mergeStatField.medianPixelADCs[1];
-	mergeStatField.mod                       = mod;
-	mergeStatField.mod_on                    = mod_on;
+	mergeStatField.clusterSize_1            = currentCluster.size();
+	mergeStatField.clusterSize_2            = clusterToMerge.size();
+	mergeStatField.sizeDifference           = currentCluster.size() - clusterToMerge.size();
+	mergeStatField.clusterCharge_1          = currentCluster.charge();
+	mergeStatField.clusterCharge_2          = clusterToMerge.charge();
+	mergeStatField.chargeDifference         = currentCluster.charge() - clusterToMerge.charge();
+	// FIXME: Add missing fields
+	mergeStatField.clusterAngle_1           = -1;
+	mergeStatField.clusterAngle_2           = -1;
+	mergeStatField.angleDifference          = -1;
+	mergeStatField.isMarkedAsSplitCluster_1 = isCurrentClusterSplit;
+	mergeStatField.isMarkedAsSplitCluster_2 = -1;
+	mergeStatField.distanceInPixels         = -1;
+	mergeStatField.mod                      = mod;
+	mergeStatField.mod_on                   = mod_on;
 	mergeTree -> Fill();
 }
 
@@ -515,9 +512,9 @@ void SplitClusterAnalyzer::savePixelData(const SiPixelCluster::Pixel& pixelToSav
 // Layer 3: [-22, 22];
 // Pixels per module in ladder coordinate direction: 80 * 2 = 160
 // Histo definition:
-// Layer 1: [-10, 10] -> -> [1679, 1679];
-// Layer 2: [-16, 16] -> -> [2639, 2639];
-// Layer 3: [-22, 22] -> -> [3599, 3599];
+// Layer 1: [-10, 10] -> [1679, 1679];
+// Layer 2: [-16, 16] -> [2639, 2639];
+// Layer 3: [-22, 22] -> [3599, 3599];
 // Module coordinate range:
 // All layers: [-4, 4] + extra for 0
 // Pixels per module in ladder coordinate direction: 52 * 8 = 416
@@ -550,6 +547,15 @@ void SplitClusterAnalyzer::fillEventPlot(const SiPixelCluster::Pixel& pixelToSav
 	{
 		if(mod_on.ladder < 0) ladderCoordinate = (mod_on.ladder + 0.5) * 160 - pixelToSave.x;
 		if(0 < mod_on.ladder) ladderCoordinate = (mod_on.ladder + 0.5) * 160 - pixelToSave.x - 1;
+		// Correcting for the fact that the first module is only a half
+		if(mod_on.ladder == 1)
+		{
+			ladderCoordinate += 80;
+		}
+		if(mod_on.ladder == -1)
+		{
+			ladderCoordinate -= 80;
+		}
 	}
 	else
 	{
@@ -731,6 +737,23 @@ DEFINE_FWK_MODULE(SplitClusterAnalyzer);
 ///////////////////////
 // CODE DUMP AREA :) //
 ///////////////////////
+
+// mergeStatField.clusterSizes[0]           = currentCluster.size();
+// mergeStatField.clusterSizes[1]           = clusterToMerge.size();
+// mergeStatField.clusterCharges[0]         = currentCluster.charge();
+// mergeStatField.clusterCharges[1]         = clusterToMerge.charge();
+// mergeStatField.totalPixelADCs[0]         = currentClusterTotalPixelADC;
+// mergeStatField.totalPixelADCs[1]         = clusterToMergeTotalPixelADC;
+// mergeStatField.medianPixelADCs[0]        = currentClPixelADCs[currentClPixelADCs.size() / 2];
+// mergeStatField.medianPixelADCs[1]        = clusterToMergeADCs[clusterToMergeADCs.size() / 2];
+// mergeStatField.averagePixelADCs[0]       = currentClusterTotalPixelADC / currentClPixelADCs.size();
+// mergeStatField.averagePixelADCs[1]       = clusterToMergeTotalPixelADC / clusterToMergeADCs.size();
+// mergeStatField.sizeDifference            = currentCluster.size()   - clusterToMerge.size();
+// mergeStatField.chargeDifference          = currentCluster.charge() - clusterToMerge.charge();
+// // mergeStatField.closestPixelADCDifference = closePixelPairs[0].first.adc - closePixelPairs[0].second.adc;
+// mergeStatField.isSplitCluster            = isCurrentClusterSplit;
+// mergeStatField.averagePixelADCDifference = mergeStatField.averagePixelADCs[0] - mergeStatField.averagePixelADCs[1];
+// mergeStatField.medianPixelADCDifference  = mergeStatField.medianPixelADCs[0]  - mergeStatField.medianPixelADCs[1];
 
 // // Filling the plot five times for every marker, to visualize their positions 
 // void SplitClusterAnalyzer::addMarkersToEventPlot(const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection)

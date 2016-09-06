@@ -15,42 +15,42 @@
 class MergingStatisticsData
 {
 	public:
-		int clusterSizes[2];
-		float clusterCharges[2];
-		int totalPixelADCs[2];
-		int medianPixelADCs[2];
-		float averagePixelADCs[2];
-		float sizeDifference;
+		int clusterSize_1;
+		int clusterSize_2;
+		int sizeDifference;
+		float clusterCharge_1;
+		float clusterCharge_2;
 		float chargeDifference;
-		// int closestPixelADCDifference;
-		int isSplitCluster;
-		float averagePixelADCDifference;
-		int medianPixelADCDifference;
+		float clusterAngle_1;
+		float clusterAngle_2;
+		float angleDifference;
+		int isMarkedAsSplitCluster_1;
+		int isMarkedAsSplitCluster_2;
+		int distanceInPixels;
 		// Module
 		ModuleData mod;
 		ModuleData mod_on;
 		// Instantiation
-		MergingStatisticsData() { init(); mod.init(); mod_on.init(); };
+		MergingStatisticsData() { init(); };
 		void init()
 		{
-			for(int i = 0; i < 2; ++i)
-			{
-				clusterSizes[i] = NOVAL_I;
-				clusterCharges[i] = NOVAL_F;
-				totalPixelADCs[i] = NOVAL_I;
-				medianPixelADCs[i] = NOVAL_I;
-				averagePixelADCs[i] = NOVAL_F;
-			}
-			sizeDifference = NOVAL_F;
+			mod.init();
+			mod_on.init();
+			clusterSize_1 = NOVAL_I;
+			clusterSize_2 = NOVAL_I;
+			sizeDifference = NOVAL_I;
+			clusterCharge_1 = NOVAL_F;
+			clusterCharge_2 = NOVAL_F;
 			chargeDifference = NOVAL_F;
-			// closestPixelADCDifference = NOVAL_I;
-			isSplitCluster = NOVAL_I;
-			averagePixelADCDifference = NOVAL_F;
-			medianPixelADCDifference = NOVAL_I;
+			clusterAngle_1 = NOVAL_F;
+			clusterAngle_2 = NOVAL_F;
+			angleDifference = NOVAL_F;
+			isMarkedAsSplitCluster_1 = NOVAL_I;
+			isMarkedAsSplitCluster_2 = NOVAL_I;
+			distanceInPixels = NOVAL_I;
 		};
 		// Data list
-		// std::string list = "clusterSizes[2]/I:clusterCharges[2]/F:totalPixelADCs[2]/I:medianPixelADCs[2]/I:averagePixelADCs[2]/F:sizeDifference/F:chargeDifference/F:closestPixelADCDifference/I:averagePixelADCDifference/F:medianPixelADCDifference/I";
-		std::string list = "clusterSizes[2]/I:clusterCharges[2]/F:totalPixelADCs[2]/I:medianPixelADCs[2]/I:averagePixelADCs[2]/F:sizeDifference/F:chargeDifference/F:isSplitCluster/I:averagePixelADCDifference/F:medianPixelADCDifference/I";
+		std::string list = "clusterSize_1/I:clusterSize_2/I:sizeDifference/I:clusterCharge_1/F:clusterCharge_2/F:chargeDifference/F:clusterAngle_1/F:clusterAngle_2/F:angleDifference/F:isMarkedAsSplitCluster_1/I:isMarkedAsSplitCluster_2/I:distanceInPixels/I";
 };
-
+ 
 #endif
