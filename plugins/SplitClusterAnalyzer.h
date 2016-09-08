@@ -102,23 +102,25 @@ class SplitClusterAnalyzer : public edm::EDAnalyzer
 		std::string ntupleOutputFilename = "Ntuple_scm.root";
 		TFile*      ntupleOutputFile;
 		// Tree definition
-		TTree*                eventTree;
-		EventData             eventField;
-		TTree*                clusterTree;
-		Cluster               clusterField;
-		TTree*                mergeTree;
-		MergingStatisticsData mergeStatField;
-		TTree*                mergeSnapshotTree;
-		TTree*                pixelTree;
-		Pixel                 pixelField;
-		int                   mergeSnapshotField[1024];
-		unsigned int          numSavedSnapshots   = 0;
-		unsigned int          maxSnapshotsToSave  = 10;
-		unsigned int          numSavedEventPlots  = 0;
-		unsigned int          maxEventPlotsToSave = 10;
-		TH2D*                 currentEventPlotLayer1;
-		TH2D*                 currentEventPlotLayer2;
-		TH2D*                 currentEventPlotLayer3;
+		TTree*                             eventTree;
+		EventData                          eventField;
+		MergingStatisticsDataArrays        eventMergingStatisticsField;
+		// std::vector<MergingStatisticsData> eventMergingStatisticsField;
+		TTree*                             clusterTree;
+		Cluster                            clusterField;
+		TTree*                             mergeTree;
+		MergingStatisticsData              mergeStatField;
+		TTree*                             mergeSnapshotTree;
+		TTree*                             pixelTree;
+		Pixel                              pixelField;
+		int                                mergeSnapshotField[1024];
+		unsigned int                       numSavedSnapshots   = 0;
+		unsigned int                       maxSnapshotsToSave  = 10;
+		unsigned int                       numSavedEventPlots  = 0;
+		unsigned int                       maxEventPlotsToSave = 10;
+		TH2D*                              currentEventPlotLayer1;
+		TH2D*                              currentEventPlotLayer2;
+		TH2D*                              currentEventPlotLayer3;
 		// Data containers
 		// std::multimap<SiPixelCluster&, int> clusterMergeableDigis;
 
@@ -139,6 +141,7 @@ class SplitClusterAnalyzer : public edm::EDAnalyzer
 		void                               createEventPlot();
 		// void                               addMarkersToEventPlot(const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection);
 		void                               fillEventPlot(const SiPixelCluster::Pixel& pixelToSave, const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection);
+		void                               fillEventPlotWithMarkersOnModule(const ModuleData& mod_on, const edm::DetSet<PixelDigi>& digiFlagsCollection);
 		void                               saveEventPlot();
 
 		static bool                        checkClusterPairOrder(const SiPixelCluster& lhs, const SiPixelCluster& rhs);
